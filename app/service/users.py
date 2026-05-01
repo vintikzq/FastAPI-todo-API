@@ -1,8 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.repository import users as users_repository
-from app.schemas import UserResponse
-from app.auth import hash_password
+from app.schemas import TokenResponse, UserResponse
+from app.auth import create_access_token, hash_password, verify_password
 
 
 def create_user(db: Session, login: str, password: str) -> UserResponse:
@@ -15,3 +15,19 @@ def create_user(db: Session, login: str, password: str) -> UserResponse:
     user = users_repository.create_user(db, login, hashed_password)
     db.commit()
     return UserResponse.model_validate(user)
+
+
+def authenticate_user(db: Session, login: str, password: str) -> TokenResponse:
+    user = users_repository.get_user_by_login(db, login)
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect login or password"
+        )
+    if not verify_password(password, user.hashed_password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect login or password"
+        )
+    token = create_access_token({'sub': str(user.id)})
+    return TokenResponse(access_token=token)

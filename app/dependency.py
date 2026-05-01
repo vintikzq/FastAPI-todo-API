@@ -11,7 +11,7 @@ from app.models import User
 from app.repository.users import get_user_by_id
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login")
 
 
 def get_db() -> Generator[Session, None, None]:

@@ -18,7 +18,7 @@ def verify_password(password, hashed_password) -> bool:
     )
 
 
-def create_access_token(payload: dict):
+def create_access_token(payload: dict) -> str:
     data = payload.copy()
     exp_time = datetime.now(timezone.utc) + \
         timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
