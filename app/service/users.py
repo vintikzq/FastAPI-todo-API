@@ -18,6 +18,19 @@ def create_user(db: Session, login: str, password: str) -> UserResponse:
 
 
 def authenticate_user(db: Session, login: str, password: str) -> TokenResponse:
+    """Authenticate a user and return a JWT access token.    
+
+    Args:
+        db (Session): Database session.
+        login (str): User login.
+        password (str): User plain-text password.
+
+    Raises:
+        HTTPException: If the login or password does not match.
+
+    Returns:
+        TokenResponse: Object containing the access token and its type.
+    """
     user = users_repository.get_user_by_login(db, login)
     if user is None:
         raise HTTPException(

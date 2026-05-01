@@ -23,6 +23,18 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_current_user(credentials: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+    """Validate the JWT token and return the current user.
+
+    Args:
+        credentials (str, optional): JWT access token from Authorization header. Defaults to Depends(oauth2_scheme).
+        db (Session, optional): Database session. Defaults to Depends(get_db).
+
+    Raises:
+        HTTPException: If token is invalid, expired, or the user does not exist.
+
+    Returns:
+        User: The authenticated User model instance.
+    """
     try:
         token = jwt.decode(credentials, settings.SECRET_KEY,
                            [settings.ALGORITHM])
