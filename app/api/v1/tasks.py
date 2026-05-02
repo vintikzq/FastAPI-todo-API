@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.dependency import get_current_user, get_db
 from app.enums import TodoStatus
 from app.models import User
-from app.schemas import TaskRequest, TaskResponse
+from app.schemas import TaskRequest, TaskResponse, TaskUpdateRequest
 from app.service import tasks as tasks_service
 
 router = APIRouter()
@@ -24,6 +24,11 @@ def get_all_tasks(status: TodoStatus | None = None, sort_by_creation_date: bool 
     return tasks_service.get_all_tasks(db, current_user, status, sort_by_creation_date, limit, offset)
 
 
-@router.delete('tasks/{task_id}', summary="Delete task with id", status_code=204)
+@router.delete('/tasks/{task_id}', summary="Delete task with id", status_code=204)
 def delete_task_by_id(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return tasks_service.delete_task_by_id(db, current_user, task_id)
+
+
+@router.patch('/tasks/{task_id}', response_model=TaskResponse, summary="Update task with id")
+def update_task_by_id(task_id: int, payload: TaskUpdateRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return tasks_service.update_task_by_id(db, current_user, task_id, payload)

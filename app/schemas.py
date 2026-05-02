@@ -47,3 +47,11 @@ class TaskResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = 'bearer'
+
+
+class TaskUpdateRequest(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=127)
+    status: TodoStatus | None = None
+    priority: TodoPriority | None = None
+    due_date: datetime | None = None
+    description: str | None = Field(None, max_length=1024)

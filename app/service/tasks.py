@@ -4,7 +4,7 @@ from starlette import status
 from app.enums import TodoStatus
 from app.repository import tasks as tasks_repository
 from app.models import User
-from app.schemas import TaskRequest, TaskResponse
+from app.schemas import TaskRequest, TaskResponse, TaskUpdateRequest
 
 
 def create_task(db: Session, current_user: User, task_data: TaskRequest) -> TaskResponse:
@@ -33,7 +33,7 @@ def get_all_tasks(db: Session, current_user: User, status: TodoStatus | None, so
     return [TaskResponse.model_validate(task) for task in tasks]
 
 
-def delete_task_by_id(db: Session, current_user: User, task_id: int):
+def delete_task_by_id(db: Session, current_user: User, task_id: int) -> None:
     """Delete task by given id.
 
     Args:
@@ -55,3 +55,41 @@ def delete_task_by_id(db: Session, current_user: User, task_id: int):
             detail=f"Task {task_id} not found"
         )
     db.commit()
+
+
+def update_task_by_id(db: Session, current_user: User, task_id: int, payload: TaskUpdateRequest) -> TaskResponse:
+    """Update task by given id.
+
+    Args:
+        db (Session): Database session.
+        current_user (User): The authenticated user object.
+        task_id (int): ID of the task to update.
+        payload (TaskUpdateRequest): Pydantic model containing fields to update.
+
+    Raises:
+        HTTPException: If the task is not found or does not update.
+
+    Returns:
+        TaskResponse: The updated task data as a validated schema.
+
+    """
+    update_data = payload.model_dump(exclude_unset=True)
+    if not update_data:
+        task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
+        if not task:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Task {task_id} not found"
+            )
+        return task
+    result = tasks_repository.update_task_by_id(
+        db, current_user.id, task_id, update_data)
+    if result.rowcount == 0:  # type: ignore
+        raise HTTPException(
+            status_code=404,
+            detail=f"Task {task_id} not found"
+        )
+    db.commit()
+    updated_task = tasks_repository.get_task_by_id(
+        db, current_user.id, task_id)
+    return TaskResponse.model_validate(updated_task)

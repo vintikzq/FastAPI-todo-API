@@ -1,4 +1,4 @@
-from sqlalchemy import delete, desc, select
+from sqlalchemy import delete, desc, select, update
 from sqlalchemy.orm import Session
 from app.enums import TodoStatus
 from app.models import Tasks
@@ -45,3 +45,15 @@ def delete_task_by_id(db: Session, user_id: int, task_id: int):
                                user_id).where(Tasks.id == task_id)
     result = db.execute(stmt)
     return result.rowcount  # type: ignore
+
+
+def update_task_by_id(db: Session, user_id: int, task_id: int, update_data):
+    stmt = update(Tasks).where(Tasks.owner_id == user_id).where(
+        Tasks.id == task_id).values(**update_data)
+    return db.execute(stmt)
+
+
+def get_task_by_id(db: Session, user_id: int, task_id: int):
+    stmt = select(Tasks).where(Tasks.owner_id ==
+                               user_id).where(Tasks.id == task_id)
+    return db.execute(stmt).scalar_one_or_none()
