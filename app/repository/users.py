@@ -10,7 +10,6 @@ def get_user_by_id(db: Session, user_id: int) -> User | None:
 
 
 def create_user(db: Session, login: str, hashed_password: str) -> User:
-    print(f"DEBUG REPO: {hashed_password}")
     user = User(login=login, hashed_password=hashed_password)
     db.add(user)
     db.flush()
