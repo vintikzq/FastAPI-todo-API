@@ -1,4 +1,6 @@
+from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
+from app.enums import TodoStatus
 from app.models import Tasks
 from app.schemas import TaskRequest
 
@@ -10,3 +12,29 @@ def create_task(db: Session, user_id: int, task_data: TaskRequest):
     db.add(task)
     db.flush()
     return task
+
+
+def get_all_tasks(db: Session, user_id: int, sort_by_creation_date: bool, status: TodoStatus | None, limit: int, offset: int):
+    """Fetch all tasks for a specific user from the database.
+
+    Args:
+        db (Session): Database session.
+        user_id (int): ID of the user iwning the tasks..
+        sort_by_creation_date (bool): If true, sorts tasks by creation date (descending).
+        status (TodoStatus | None): If provided, filters tasks by their status.
+        limit (int): Maximum number of tasks to return (for pagination).
+        offset (int): Number of tasks to skip (for pagination).
+
+    Returns:
+        List[Tasks]: A list of task model instances.
+    """
+    stmt = select(Tasks).where(Tasks.owner_id == user_id)
+
+    if status:
+        stmt = stmt.where(Tasks.status == status)
+
+    if sort_by_creation_date:
+        stmt = stmt.order_by(desc(Tasks.created_at))
+
+    stmt = stmt.limit(limit).offset(offset)
+    return db.execute(stmt).scalars().all()

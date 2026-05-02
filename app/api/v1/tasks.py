@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.dependency import get_current_user, get_db
+from app.enums import TodoStatus
 from app.models import User
 from app.schemas import TaskRequest, TaskResponse
 from app.service import tasks as tasks_service
@@ -9,6 +12,13 @@ from app.service import tasks as tasks_service
 router = APIRouter()
 
 
-@router.post('/task', response_model=TaskResponse, summary="Create new task ")
+@router.post('/tasks', response_model=TaskResponse, summary="Create new task ")
 def create_task(payload: TaskRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return tasks_service.create_task(db, current_user, payload)
+
+
+@router.get('/tasks', response_model=list[TaskResponse], summary="Show list of all tasks")
+def get_all_tasks(status: TodoStatus | None = None, sort_by_creation_date: bool = False,
+                  limit: Annotated[int, Query(le=100)] = 10, offset: int = 0,
+                  db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return tasks_service.get_all_tasks(db, current_user, status, sort_by_creation_date, limit, offset)
