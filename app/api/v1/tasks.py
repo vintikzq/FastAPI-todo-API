@@ -22,3 +22,8 @@ def get_all_tasks(status: TodoStatus | None = None, sort_by_creation_date: bool 
                   limit: Annotated[int, Query(le=100)] = 10, offset: int = 0,
                   db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return tasks_service.get_all_tasks(db, current_user, status, sort_by_creation_date, limit, offset)
+
+
+@router.delete('tasks/{task_id}', summary="Delete task with id", status_code=204)
+def delete_task_by_id(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return tasks_service.delete_task_by_id(db, current_user, task_id)

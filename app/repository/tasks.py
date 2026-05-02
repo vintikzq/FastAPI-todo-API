@@ -1,4 +1,4 @@
-from sqlalchemy import desc, select
+from sqlalchemy import delete, desc, select
 from sqlalchemy.orm import Session
 from app.enums import TodoStatus
 from app.models import Tasks
@@ -38,3 +38,10 @@ def get_all_tasks(db: Session, user_id: int, sort_by_creation_date: bool, status
 
     stmt = stmt.limit(limit).offset(offset)
     return db.execute(stmt).scalars().all()
+
+
+def delete_task_by_id(db: Session, user_id: int, task_id: int):
+    stmt = delete(Tasks).where(Tasks.owner_id ==
+                               user_id).where(Tasks.id == task_id)
+    result = db.execute(stmt)
+    return result.rowcount  # type: ignore

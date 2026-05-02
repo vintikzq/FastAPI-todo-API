@@ -31,3 +31,27 @@ def get_all_tasks(db: Session, current_user: User, status: TodoStatus | None, so
     tasks = tasks_repository.get_all_tasks(
         db, current_user.id, sort_by_creation_date, status, limit, offset)
     return [TaskResponse.model_validate(task) for task in tasks]
+
+
+def delete_task_by_id(db: Session, current_user: User, task_id: int):
+    """Delete task by given id.
+
+    Args:
+        db (Session): Database session.
+        current_user (User): The authenticated user object.
+        task_id (int): Task id to be deleted.
+
+    Raises:
+        HTTPException: If the task is not found or does not belong to the user.
+
+    Returns:
+        None
+    """
+    result = tasks_repository.delete_task_by_id(db, current_user.id, task_id)
+
+    if result == 0:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Task {task_id} not found"
+        )
+    db.commit()
