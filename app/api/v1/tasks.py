@@ -12,7 +12,7 @@ from app.service import tasks as tasks_service
 router = APIRouter()
 
 
-@router.post('/tasks', response_model=TaskResponse, summary="Create new task ")
+@router.post('/tasks', response_model=TaskResponse, summary="Create new task", status_code=201)
 def create_task(payload: TaskRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return tasks_service.create_task(db, current_user, payload)
 
