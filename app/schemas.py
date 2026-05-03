@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -30,6 +30,12 @@ class TaskRequest(BaseModel):
     priority: TodoPriority = TodoPriority.LOW
     due_date: datetime | None = None
     description: str | None = Field(None, max_length=1024)
+
+    @field_validator('due_date')
+    def due_date_in_future(cls, v: datetime | None):
+        if v and v < datetime.now(timezone.utc):
+            raise ValueError("Due date cannot be in the past")
+        return v
 
 
 class TaskResponse(BaseModel):

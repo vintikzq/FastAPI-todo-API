@@ -81,7 +81,7 @@ def update_task_by_id(db: Session, current_user: User, task_id: int, payload: Ta
                 status_code=404,
                 detail=f"Task {task_id} not found"
             )
-        return task
+        return TaskResponse.model_validate(task)
     result = tasks_repository.update_task_by_id(
         db, current_user.id, task_id, update_data)
     if result.rowcount == 0:  # type: ignore

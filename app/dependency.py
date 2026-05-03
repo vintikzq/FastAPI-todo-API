@@ -38,17 +38,19 @@ def get_current_user(credentials: str = Depends(oauth2_scheme), db: Session = De
     try:
         token = jwt.decode(credentials, settings.SECRET_KEY,
                            [settings.ALGORITHM])
-        user_id = token.get('sub')
-    except JWTError:
+        user_id_str: str | None = token.get('sub')
+        if user_id_str is None:
+            raise HTTPException(
+                status_code=401,
+                detail="User is not authorized"
+            )
+        user_id = int(user_id_str)
+    except (JWTError, ValueError):
         raise HTTPException(
             status_code=401,
             detail="Token is invalid"
         )
-    if user_id is None:
-        raise HTTPException(
-            status_code=401,
-            detail="User is not authorized"
-        )
+
     user = get_user_by_id(db, user_id)
     if user is None:
         raise HTTPException(

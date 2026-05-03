@@ -7,7 +7,7 @@ from app.schemas import TaskRequest
 
 def create_task(db: Session, user_id: int, task_data: TaskRequest):
 
-    task = Tasks(owner_id=user_id, **task_data.model_dump())
+    task = Tasks(owner_id=user_id, **task_data.model_dump(exclude_unset=True))
 
     db.add(task)
     db.flush()
