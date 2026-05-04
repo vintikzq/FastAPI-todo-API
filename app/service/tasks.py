@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from starlette import status
 from app.enums import TodoStatus
 from app.repository import tasks as tasks_repository
 from app.models import User
@@ -93,3 +92,14 @@ def update_task_by_id(db: Session, current_user: User, task_id: int, payload: Ta
     updated_task = tasks_repository.get_task_by_id(
         db, current_user.id, task_id)
     return TaskResponse.model_validate(updated_task)
+
+
+def get_task_by_id(db: Session, current_user: User, task_id: int) -> TaskResponse:
+    task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Task {task_id} not found"
+        )
+
+    return TaskResponse.model_validate(task)

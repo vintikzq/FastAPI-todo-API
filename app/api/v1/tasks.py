@@ -32,3 +32,8 @@ def delete_task_by_id(task_id: int, db: Session = Depends(get_db), current_user:
 @router.patch('/tasks/{task_id}', response_model=TaskResponse, summary="Update task with id")
 def update_task_by_id(task_id: int, payload: TaskUpdateRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return tasks_service.update_task_by_id(db, current_user, task_id, payload)
+
+
+@router.get('/tasks/{task_id}', response_model=TaskResponse, summary="Show task with id")
+def get_task_by_id(task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return tasks_service.get_task_by_id(db, current_user, task_id)
