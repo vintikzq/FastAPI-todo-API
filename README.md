@@ -65,19 +65,18 @@ To run the project locally for development purposes:
 
 The project follows the **Service-Repository Pattern**, ensuring maintainability and ease of testing.
 
-app/api/ — API Route handlers (Routers) and HTTP logic.
-app/service/ — Business logic layer (validation and orchestration).
-app/repository/ — Data access layer (SQLAlchemy queries).
-app/models.py — SQLAlchemy database models.
-app/schemas.py — Pydantic validation schemas (DTOs).
-app/config.py — Settings management via Pydantic Settings.
-app/database.py — SQLAlchemy engine and session configuration.
-app/auth.py — Security utilities (password hashing and JWT token logic).
-app/main.py — FastAPI application entry point.
-migrations/ — Database version control (Alembic scripts).
-docker-compose.yml — Multi-container orchestration (API + PostgreSQL).
-Dockerfile — Instructions for building the FastAPI container.
-
+* **app/api/** — API Route handlers (Routers) and HTTP logic.
+* **app/service/** — Business logic layer (validation and orchestration).
+* **app/repository/** — Data access layer (SQLAlchemy queries).
+* **app/models.py** — SQLAlchemy database models.
+* **app/schemas.py** — Pydantic validation schemas (DTOs).
+* **app/config.py** — Settings management via Pydantic Settings.
+* **app/database.py** — SQLAlchemy engine and session configuration.
+* **app/auth.py** — Security utilities (password hashing and JWT token logic).
+* **app/main.py** — FastAPI application entry point.
+* **migrations/** — Database version control (Alembic scripts).
+* **docker-compose.yml** — Multi-container orchestration (API + PostgreSQL).
+* **Dockerfile** — Instructions for building the FastAPI container.
 ## 🧪 Testing & Coverage
 
 The project uses **Pytest** for integration testing with an isolated SQLite database.
