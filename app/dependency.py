@@ -1,6 +1,6 @@
-from typing import Generator
+from typing import Annotated, Generator
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Header
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
@@ -58,3 +58,16 @@ def get_current_user(credentials: str = Depends(oauth2_scheme), db: Session = De
             detail="User is not authorized"
         )
     return user
+
+
+def validate_internal_secret(x_internal_secret: Annotated[str | None, Header()] = None):
+    """Validate the internal secret key provided in the request headers.
+
+    Args:
+        x_internal_secret (str | None, optional): Secret key provided by the telegram bot. Defaults to None.
+
+    Raises:
+        HTTPException: 403 Forbidden if the secret is missing or invalid.
+    """
+    if x_internal_secret is None or x_internal_secret != settings.INTERNAL_BOT_SECRET:
+        raise HTTPException(status_code=403, detail='Forbidden')

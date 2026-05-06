@@ -1,10 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import sessionmaker
 from app.dependency import get_db
 from app.main import app
 from app.database import Base
+from app.config import settings
+from app.models import User
 
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False)
 
@@ -73,6 +75,34 @@ def base_task_data():
     return {'name': 'Buy flowers',
             'description': "Don't forget water the flowers",
             'priority': 'high'}
+
+
+@pytest.fixture()
+def bot_auth_headers():
+    """Returns headers with internal bot secret."""
+    return {"X-Internal-Secret": settings.INTERNAL_BOT_SECRET}
+
+
+@pytest.fixture()
+def tg_user_data():
+    """Returns telegram id for testing."""
+    return {"telegram_id": 123456789}
+
+
+@pytest.fixture()
+def registration_via_telegram(test_client, tg_user_data, bot_auth_headers):
+    response = test_client.post("/api/v1/login/telegram",
+                                json=tg_user_data,
+                                headers=bot_auth_headers)
+    assert response.status_code == 200
+
+
+@pytest.fixture()
+def get_user_count(test_session):
+    def _count():
+        stmt = select(func.count()).select_from(User)
+        return test_session.execute(stmt).scalar()
+    return _count
 
 
 @pytest.fixture()

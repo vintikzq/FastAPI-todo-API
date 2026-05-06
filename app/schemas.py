@@ -17,6 +17,10 @@ class UserRequest(BaseModel):
         return v
 
 
+class UserTelegramRequest(BaseModel):
+    telegram_id: int
+
+
 class UserResponse(BaseModel):
     id: int
     login: str

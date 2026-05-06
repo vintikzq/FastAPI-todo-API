@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    INTERNAL_BOT_SECRET: str
     SECRET_KEY: str = "fallback_secret_key"
     ACCESS_TOKEN_EXPIRE: int = 30
     ALGORITHM: str = 'HS256'
@@ -18,4 +19,4 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env')
 
 
-settings = Settings()
+settings = Settings()  # type: ignore

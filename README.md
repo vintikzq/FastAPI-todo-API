@@ -6,6 +6,7 @@ A professional, production-ready RESTful API for personal task management. This 
 
 - **Clean Architecture:** Strict separation of concerns using **Router -> Service -> Repository** pattern.
 - **Robust Authentication:** Secure OAuth2 password flow with **JWT** tokens and **Bcrypt** password hashing.
+- **Hybrid Authentication:** Supports both standard OAuth2 password flow and Silent S2S (Service-to-Service) Authentication for Telegram clients via secure internal secret validation.
 - **Advanced CRUD:** Full support for pagination, complex filtering (by status), and partial updates (**PATCH**).
 - **Data Integrity:** Enterprise-grade validation with **Pydantic v2** and **SQLAlchemy 2.0** (Mapped/mapped_column style).
 - **Modern Infrastructure:** Fully containerized with **Docker** and automated database schema management via **Alembic**.
@@ -65,18 +66,20 @@ To run the project locally for development purposes:
 
 The project follows the **Service-Repository Pattern**, ensuring maintainability and ease of testing.
 
-* **app/api/** — API Route handlers (Routers) and HTTP logic.
-* **app/service/** — Business logic layer (validation and orchestration).
-* **app/repository/** — Data access layer (SQLAlchemy queries).
-* **app/models.py** — SQLAlchemy database models.
-* **app/schemas.py** — Pydantic validation schemas (DTOs).
-* **app/config.py** — Settings management via Pydantic Settings.
-* **app/database.py** — SQLAlchemy engine and session configuration.
-* **app/auth.py** — Security utilities (password hashing and JWT token logic).
-* **app/main.py** — FastAPI application entry point.
-* **migrations/** — Database version control (Alembic scripts).
-* **docker-compose.yml** — Multi-container orchestration (API + PostgreSQL).
-* **Dockerfile** — Instructions for building the FastAPI container.
+- **app/api/** — API Route handlers (Routers) and HTTP logic.
+- **app/service/** — Business logic layer (validation and orchestration).
+- **app/repository/** — Data access layer (SQLAlchemy queries).
+- **app/models.py** — SQLAlchemy database models.
+- **app/schemas.py** — Pydantic validation schemas (DTOs).
+- **app/config.py** — Settings management via Pydantic Settings.
+- **app/database.py** — SQLAlchemy engine and session configuration.
+- **app/auth.py** — Security utilities (password hashing and JWT token logic).
+- **app/dependency.py** — FastAPI dependencies (e.g., database sessions, security headers validation).
+- **app/main.py** — FastAPI application entry point.
+- **migrations/** — Database version control (Alembic scripts).
+- **docker-compose.yml** — Multi-container orchestration (API + PostgreSQL).
+- **Dockerfile** — Instructions for building the FastAPI container.
+
 ## 🧪 Testing & Coverage
 
 The project uses **Pytest** for integration testing with an isolated SQLite database.
