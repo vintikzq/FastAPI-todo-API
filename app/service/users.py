@@ -1,6 +1,7 @@
 import secrets
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.repository import users as users_repository
 from app.schemas import TokenResponse, UserResponse, UserTelegramRequest
@@ -62,11 +63,19 @@ def authenticate_user_via_telegram(db: Session, payload: UserTelegramRequest) ->
     user = users_repository.get_user_by_telegram_id(db, payload.telegram_id)
 
     if user is None:
-        telegram_id = payload.telegram_id
-        username = f"tg_{telegram_id}"
-        random_password = secrets.token_urlsafe(16)
-        user = create_user(
-            db, login=username, password=random_password, telegram_id=telegram_id)
+        try:
+            telegram_id = payload.telegram_id
+            username = f"tg_{telegram_id}"
+            random_password = secrets.token_urlsafe(16)
+            user = create_user(
+                db, login=username, password=random_password, telegram_id=telegram_id)
+        except IntegrityError:
+            db.rollback()
+            user = users_repository.get_user_by_telegram_id(
+                db, payload.telegram_id)
+            if user is None:
+                raise HTTPException(
+                    status_code=500, detail="Database sync error")
 
     token = create_access_token({'sub': str(user.id)})
     return TokenResponse(access_token=token)
