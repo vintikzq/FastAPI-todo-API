@@ -30,7 +30,10 @@ def get_all_tasks(db: Session, user_id: int, sort_by_creation_date: bool, status
     """
     stmt = select(Tasks).where(Tasks.owner_id == user_id)
 
-    if status:
+    if status == TodoStatus.ACTIVE:
+        stmt = stmt.where(Tasks.status != TodoStatus.DONE)
+
+    elif status:
         stmt = stmt.where(Tasks.status == status)
 
     if sort_by_creation_date:
