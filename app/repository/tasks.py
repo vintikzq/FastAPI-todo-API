@@ -1,4 +1,4 @@
-from sqlalchemy import delete, desc, select, update
+from sqlalchemy import delete, desc, func, select, update
 from sqlalchemy.orm import Session
 from app.enums import TodoStatus
 from app.models import Tasks
@@ -57,3 +57,13 @@ def get_task_by_id(db: Session, user_id: int, task_id: int):
     stmt = select(Tasks).where(Tasks.owner_id ==
                                user_id).where(Tasks.id == task_id)
     return db.execute(stmt).scalar_one_or_none()
+
+
+def get_tasks_count(db: Session, user_id: int, status: TodoStatus | None = None):
+    """Count tasks. If status selcted count with status filter."""
+    stmt = select(func.count(Tasks.id)).where(Tasks.owner_id == user_id)
+
+    if status:
+        stmt = stmt.where(Tasks.status == status)
+
+    return db.execute(stmt).scalar() or 0

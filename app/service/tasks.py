@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.enums import TodoStatus
 from app.repository import tasks as tasks_repository
 from app.models import User
-from app.schemas import TaskRequest, TaskResponse, TaskUpdateRequest
+from app.schemas import StatsResponse, TaskRequest, TaskResponse, TaskUpdateRequest
 
 
 def create_task(db: Session, current_user: User, task_data: TaskRequest) -> TaskResponse:
@@ -103,3 +103,19 @@ def get_task_by_id(db: Session, current_user: User, task_id: int) -> TaskRespons
         )
 
     return TaskResponse.model_validate(task)
+
+
+def get_tasks_stats(db: Session, current_user: User):
+    """Validate tasks count from db to pydantic model."""
+    done_tasks = tasks_repository.get_tasks_count(
+        db, current_user.id,
+        status=TodoStatus.DONE
+    )
+
+    all_tasks = tasks_repository.get_tasks_count(
+        db, current_user.id
+    )
+
+    data = {'completed_count': done_tasks, 'total_tasks': all_tasks}
+
+    return StatsResponse.model_validate(data)

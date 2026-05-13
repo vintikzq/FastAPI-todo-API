@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.dependency import get_current_user, get_db
 from app.enums import TodoStatus
 from app.models import User
-from app.schemas import TaskRequest, TaskResponse, TaskUpdateRequest
+from app.schemas import StatsResponse, TaskRequest, TaskResponse, TaskUpdateRequest
 from app.service import tasks as tasks_service
 
 router = APIRouter()
@@ -32,6 +32,11 @@ def delete_task_by_id(task_id: int, db: Session = Depends(get_db), current_user:
 @router.patch('/tasks/{task_id}', response_model=TaskResponse, summary="Update task with id")
 def update_task_by_id(task_id: int, payload: TaskUpdateRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return tasks_service.update_task_by_id(db, current_user, task_id, payload)
+
+
+@router.get('/tasks/stats', response_model=StatsResponse, summary="Gives tasks stats")
+def get_tasks_stats(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return tasks_service.get_tasks_stats(db, current_user)
 
 
 @router.get('/tasks/{task_id}', response_model=TaskResponse, summary="Show task with id")

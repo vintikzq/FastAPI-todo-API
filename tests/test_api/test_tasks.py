@@ -138,3 +138,18 @@ def test_delete_task_should_return_401_when_unauthorized(test_client):
 
     assert response.status_code == 401
     assert response.json() == {'detail': 'Not authenticated'}
+
+
+def test_get_stats_should_return_correct_pydantic_model_and_200(test_client, auth_headers_first_user, test_task):
+    response = test_client.get("/api/v1/tasks/stats",
+                               headers=auth_headers_first_user)
+
+    assert response.status_code == 200
+    assert response.json() == {'completed_count': 0, 'total_tasks': 1}
+
+
+def test_get_stats_should_return_401_when_unathorized(test_client):
+    response = test_client.get("/api/v1/tasks/stats")
+
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
